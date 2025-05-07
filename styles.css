@@ -1,0 +1,261 @@
+body
+{
+    font-family: 'Helvetica', sans-serif;
+    color: #444444;
+    background-color: #FAFAFA;
+}
+
+.main-container{
+	background-image: url('https://cloud.githubusercontent.com/assets/398893/15136779/4e765036-1639-11e6-9201-67e728e86f39.jpg');
+	position: absolute;
+	z-index: 0;
+	bottom: 0;
+	left: 0;
+	display: flex;
+	flex-direction: column-reverse;
+	align-items: flex-start;
+	height: 100%;
+	overflow-y: hidden;
+	overflow-x: hidden;
+	scroll-behavior: smooth;
+	width: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
+	padding: 4px;
+	overflow-wrap: anywhere;
+}
+
+#status-container {
+	text-transform: uppercase;
+	font-family: "Cal Sans", sans-serif;
+	font-weight: bold;
+	font-size: 30px;
+	width: 400px;
+	max-width: fit-content;
+	text-align: center;
+	background-color: #D12025;
+	color: white;
+	padding: 10px;
+	border-radius: 10px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.message-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.message-wrapper,
+.message-row,
+.message {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.message-row{
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	width: 100%;
+	margin-left: 38px;
+}
+
+#avatar{
+	margin-top: 6px;
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	object-fit: cover;
+	grid-column: 1;
+	grid-row: 1;
+}
+
+#badge{
+	width: 15px;
+	height: 15px;
+	margin-left: 2px;
+	vertical-align: middle;
+}
+
+#emotes{
+	display: inline-block;
+	margin-right: 0.1em;
+	position: relative;
+	height: 1.3em;
+	vertical-align: middle;
+	top: 0em;
+}
+
+#user-message{
+	font-family: "Open Sans", sans-serif;
+	color: #fff;
+	width: 100%;
+	text-shadow: rgb(0, 0, 0) 1px 1px 1px;
+	text-align: left;
+	grid-column: 2;
+	grid-row: 2;
+}
+
+/* Follow */
+
+.main-container .follow-row{
+	align-items: center;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.follow-row{
+	text-align: center;
+	background-color: #202C33;
+	color: #fff;
+	padding: 10px;
+	border-radius: 25px;
+	align-self: center;
+}
+
+.follow.received{
+	text-align: center;
+	
+}
+
+.follow-message{
+	font-size: 14px;
+	font-family: 'Helvetica', sans-serif;
+    color: #fff;
+	padding: 4px;
+}
+
+/* Messages Reply */
+
+.messageReply-wrapper{
+	background-color: #1D282F;
+	border-radius: 10px;
+	margin-top: 4px;
+	margin-bottom: 6px;
+}
+
+.replyInfo{
+	padding: 8px;
+}
+
+.replyUser{
+	margin-bottom: 5px;
+}
+
+/* Messages */
+
+.message {
+	color: #fff;
+	clear: both;
+	font-size: 14px;
+	padding: 8px;
+	position: relative;
+	margin: 2px 0;
+	word-wrap: break-word;
+	z-index: -1;
+	max-width: 85%;
+  }
+  
+  .message:after {
+	position: absolute;
+	content: "";
+	width: 0;
+	height: 0;
+	border-style: solid;
+  }
+  
+  .metadata {
+	display: inline-block;
+	float: right;
+	padding: 0 0 0 7px;
+	position: relative;
+	bottom: -4px;
+  }
+  
+  .metadata #time {
+	color: #fff;
+	font-size: 11px;
+	display: inline-block;
+  }
+  
+  .metadata .tick {
+	display: inline-block;
+	margin-left: 2px;
+	position: relative;
+	top: 4px;
+	height: 16px;
+	width: 16px;
+  }
+  
+  .metadata .tick svg {
+	position: absolute;
+	transition: .5s ease-in-out;
+  }
+  
+  .metadata .tick svg:first-child {
+	-webkit-backface-visibility: hidden;
+			backface-visibility: hidden;
+	-webkit-transform: perspective(800px) rotateY(180deg);
+			transform: perspective(800px) rotateY(180deg);
+  }
+  
+  .metadata .tick svg:last-child {
+	-webkit-backface-visibility: hidden;
+			backface-visibility: hidden;
+	-webkit-transform: perspective(800px) rotateY(0deg);
+			transform: perspective(800px) rotateY(0deg);
+  }
+  
+  .metadata .tick-animation svg:first-child {
+	-webkit-transform: perspective(800px) rotateY(0);
+			transform: perspective(800px) rotateY(0);
+  }
+  
+  .metadata .tick-animation svg:last-child {
+	-webkit-transform: perspective(800px) rotateY(-179.9deg);
+			transform: perspective(800px) rotateY(-179.9deg);
+  }
+  
+  .message:first-child {
+	margin: 1px;
+  }
+  
+  .message.received {
+	bottom: 0;
+	left: 0;
+	margin-left: 10px;
+	background: #293942;
+	border-radius: 0px 5px 5px 5px;
+  }
+  
+  .message.received .metadata {
+	padding: 0 0 0 16px;
+  }
+  
+  .message.received:after {
+	border-width: 0px 10px 10px 0;
+	border-color: transparent #293942 transparent transparent;
+	top: 0;
+	left: -10px;
+  }
+
+  .message.received.no-tail:after {
+	display: none;
+  }
+
+  .message.received.no-tail {
+	border-radius: 5px;
+  }
+
+  .message-row {
+	margin-top: 4px;
+  }
+  
+  .message-wrapper {
+	margin-top: 10px;
+  }
+  
