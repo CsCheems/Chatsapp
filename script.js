@@ -8,6 +8,7 @@ let totalMessages = 0;
 let ultimoUsuario = '';
 const avatarHashMap = new Map();
 const colorHashMap = new Map();
+const emoteHashMap = new Map();
 
 //CLIENTE//
 const client = new StreamerbotClient({
@@ -56,7 +57,6 @@ async function ChatMessage(data) {
     const color = data.user.color;
     const msgId = data.messageId;
     const esRespuesta = data.message.isReply;
-    console.log(esRespuesta);
     let message = data;
     let badges = '';
     let avatarImageUrl = '';
@@ -129,7 +129,7 @@ async function ChatMessage(data) {
 
     //OBTENCION DE EMOTES//
     message = agregarEmotes(message);
-    //replyMsg = agregarEmotesARespuestas(replyMsg);
+    replyMsg = agregarEmotesARespuestas(replyMsg);
 
     //REGEX PARA IMAGENES//
     const imgRegex = /^https:\/\/.*\.(gif|png|jpg|jpeg|webp)$/;
@@ -142,8 +142,6 @@ async function ChatMessage(data) {
     } else {
         console.log("No cuenta con el permiso necesario o no es imagen");
     }
-
-    
 
     //TIMESTAMP//
     const now = new Date();
@@ -158,7 +156,9 @@ async function ChatMessage(data) {
 
     totalMessages += 1;
 
+    //MENSAJE ARMADO//
     if(esRespuesta){
+        //replyMsg = recortarTexto(replyMsg, 90);
         message = message.replace(/^@\w+\s*/, '');
         replyMsg = replyMsg.replace(/^@\w+\s*/, '');
         if(ultimoUsuario !== usuario){
@@ -204,7 +204,6 @@ async function ChatMessage(data) {
             </div>`;
         }
     }else{
-        //MENSAJE ARMADO//
     if (ultimoUsuario !== usuario) {
         ultimoUsuario = usuario;
         element = `
@@ -228,10 +227,7 @@ async function ChatMessage(data) {
             </div>
           </div>`;
       }
-    }
-
-    
-      
+    }    
 
     $('.main-container').prepend(element);
 
@@ -305,6 +301,9 @@ function agregarEmotes(message){
             });
             if(typeof result[0] !== "undefined"){
                 let url = result[0]['imageUrl'];
+                if(!emoteHashMap.has(key)){
+                    emoteHashMap.set(key, url);
+                }
                 return `<img alt="" src="${url}" id="emotes"/>`;
             }else return key;
         }
@@ -312,9 +311,17 @@ function agregarEmotes(message){
     return text;
 }
 
-// function agregarEmotesARespuestas(reply){
-
-// }
+function agregarEmotesARespuestas(reply){
+     let text = html_encode(reply);
+     text = text.replace(/([^\s]+)/g, (match) => {
+         if (emoteHashMap.has(match)) {
+             const url = emoteHashMap.get(match);
+             return `<img alt="${match}" src="${url}" id="emotes"/>`;
+         }
+         return match;
+     });
+     return text;
+}
 
 function html_encode(e) {
     return e.replace(/[<>"^]/g, function (e) {
@@ -346,6 +353,12 @@ function obtenerBooleanos(parametro, valor){
     }else{
         return valor;
     }
+}
+
+function recortarTexto(replyText, maxLength) {
+    return replyText.length > maxLength
+        ? replyText.substring(0, maxLength - 3) + "..."
+        : replyText;
 }
 
 //STREAMERBOT STATUS FUNCTION//
