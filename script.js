@@ -9,6 +9,12 @@ let ultimoUsuario = '';
 const avatarHashMap = new Map();
 const colorHashMap = new Map();
 const emoteHashMap = new Map();
+var audioNotification = document.createElement('audio');
+document.createElement('audioNotification');
+audioNotification.setAttribute('src', './static/IPhone WhatsApp sound.mp3');
+audioNotification.volume = 0.25;
+
+const checkmark = `<img src='https://img.icons8.com/?size=12&id=21740&format=png&color=00C2FF'/>`;
 
 //CLIENTE//
 const client = new StreamerbotClient({
@@ -37,15 +43,33 @@ const showGiantEmotes = obtenerBooleanos("mostrarEmotesGigantes", true);
 const excludeCommands = obtenerBooleanos("excluirComandos", true);
 const ignoredUsers = urlParameters.get("usuariosIgnorados") || "";
 
+
 //EVENTOS//
 client.on('Twitch.ChatMessage', (response) => {
+    // if(response.data.user.name === 'ChemitaDev'){
+    //     ChatMessageIsMe(response.data);
+    // }else{
+    //     ChatMessage(response.data);
+    // }
     ChatMessage(response.data);
+    
 })
 
 client.on('Twitch.Follow', (response) => {
     FollowNotification(response.data);
 })
 
+client.on('Twitch.Raid', (response) => {
+    RaidNotification(response.data);
+})
+
+client.on('Twitch.UserTimeOut', (response)=> {
+    TimeoutUser(response.data);
+})
+
+client.on('Twitch.UserBanned', (response)=> {
+    BannedUser(response.data);
+})
 
 //MENSAJE DE CHAT//
 async function ChatMessage(data) {
@@ -88,14 +112,6 @@ async function ChatMessage(data) {
     if(ignoredUsers.includes(usuario)){
         return;
     }
-
-    client.on('Twitch.UserTimeOut', (response)=> {
-        TimeoutUser(response.data);
-    })
-    
-    client.on('Twitch.UserBanned', (response)=> {
-        BannedUser(response.data);
-    })
 
     //ASIGNAR AVATAR//
     if(!avatarHashMap.has(usuario)){
@@ -158,7 +174,6 @@ async function ChatMessage(data) {
 
     //MENSAJE ARMADO//
     if(esRespuesta){
-        //replyMsg = recortarTexto(replyMsg, 90);
         message = message.replace(/^@\w+\s*/, '');
         replyMsg = replyMsg.replace(/^@\w+\s*/, '');
         if(ultimoUsuario !== usuario){
@@ -245,6 +260,150 @@ async function ChatMessage(data) {
     });
 }
 
+//IS ME MESSAGE//
+async function ChatMessageIsMe(data) {
+    console.log(data);
+    //ASIGNACION DE VALORES OBTENIDOS DEL DATA//
+    const usuario = data.user.name;
+    const uid = data.message.userId;
+    const role = data.user.role;
+    const color = data.user.color;
+    const msgId = data.messageId;
+    const esRespuesta = data.message.isReply;
+    let message = data;
+    let timestamp= '';
+
+    let replyUser = '';
+    let replyUserId = '';
+    let replyMsg = '';
+    let replyMsgId = '';
+
+    //AQUI ASIGNAMOS LOS COLORES AL HASHMAP//
+    colorHashMap.set(usuario, color);
+
+    //VALORES PARA LA RESPUESTA//
+    if(esRespuesta){
+         replyUser = data.message.reply.userName;
+         replyUserId = data.message.reply.Id;
+         replyMsg = data.message.reply.msgBody;
+         replyMsgId = data.message.reply.msgId;
+    }
+    
+    //VERIFICAMOS SI LOS COMANDOS SON EXCLUIDOS//
+    if(data.message.message.startsWith("!") && excludeCommands){
+        return;
+    }
+
+    //VERIFICAMOS SI EL USUARIO ES IGNORADO//
+    if(ignoredUsers.includes(usuario)){
+        return;
+    }
+
+    //OBTENCION DE EMOTES//
+    message = agregarEmotes(message);
+    replyMsg = agregarEmotesARespuestas(replyMsg);
+
+    //REGEX PARA IMAGENES//
+    const imgRegex = /^https:\/\/.*\.(gif|png|jpg|jpeg|webp)$/;
+    const imgMatch = message.match(imgRegex);
+        //true && 1 >= 0 && 0 != 0 && true
+    if (imgMatch && role >= rolUsuario && rolUsuario != 0 && showImages) {
+            const imgSrc = imgMatch[0];
+            const imgTag = `<img src="${imgSrc}" alt="Image" id="imgur-image" />`;
+            message = message.replace(imgMatch[0], imgTag);
+    } else {
+        console.log("No cuenta con el permiso necesario o no es imagen");
+    }
+
+    //TIMESTAMP//
+    const now = new Date();
+    const horas = String(now.getHours()).padStart(2, '0');
+    const minutos = String(now.getMinutes()).padStart(2, '0');
+    const time = `${horas}:${minutos}`;
+    
+    timestamp = `<span id="time" style="margin-right: 4px">${time}</span>`;
+
+    totalMessages += 1;
+
+    //MENSAJE ARMADO//
+    if(esRespuesta){
+        message = message.replace(/^@\w+\s*/, '');
+        replyMsg = replyMsg.replace(/^@\w+\s*/, '');
+        if(ultimoUsuario !== usuario){
+            ultimoUsuario = usuario;
+            const replyUserColor = colorHashMap.get(replyUser) || "#aaa";
+            element = `
+            <div data-sender="${uid}" data-msgid="${msgId}" class="message-wrapper animated new-user isMe" style="margin-top:10px" id="msg-${totalMessages}">
+              <div class="isMe message received">
+                <div>
+                    <div data-sender="${replyUserId}" data-msgid="${replyMsgId}" class="messageReply-wrapper">
+                        <div class="replyInfo">
+                            <strong class="replyUser" style="color: ${replyUserColor}">${replyUser}</strong><br>
+                            <div id="replyMsg" class="message-body" style="font-size: ${fontSize}px">${replyMsg}</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="user-message" class="message-content" style="font-size: ${fontSize}px margin-left: 10px">${message}</div>
+                <span class="metadata"><span class="time">${timestamp}</span></span>
+              </div>
+            </div>`;
+
+        } else{
+            const replyUserColor = colorHashMap.get(replyUser) || "#aaa";
+            element = `
+            <div data-sender="${uid}" data-msgid="${msgId}" class="message-row animated same-user isMe" style="margin-top:4px" id="msg-${totalMessages}">
+                <div class="isMe message received no-tail ">
+                <div>
+                    <div data-sender="${replyUserId}" data-msgid="${replyMsgId}" class="messageReply-wrapper">
+                        <div class="replyInfo">
+                            <strong class="replyUser" style="color: ${replyUserColor}">${replyUser}</strong><br>
+                            <div id="replyMsg" class="message-body" style="font-size: ${fontSize}px">${replyMsg}</div>
+                        </div>
+                    </div>
+                </div>
+                <span id="user-message" style="font-size: ${fontSize}px margin-left: 10px">${message}</span>
+                <span class="metadata"><span class="time">${timestamp}</span></span>
+                </div>
+            </div>`;
+        }
+    }else{
+    if (ultimoUsuario !== usuario) {
+        ultimoUsuario = usuario;
+        element = `
+          <div data-sender="${uid}" data-msgid="${msgId}" class="message-wrapper animated new-user isMe" style="margin-top:10px" id="msg-${totalMessages}">
+            <div class="isMe message received">
+              <div id="user-message" class="message-content" style="font-size: ${fontSize}px">${message}</div>
+              <span class="metadata"><span class="time">${timestamp}${checkmark}</span></span>
+            </div>
+          </div>`;
+      } else {
+        element = `
+          <div data-sender="${uid}" data-msgid="${msgId}" class="message-row animated same-user isMe" style="margin-top:4px" id="msg-${totalMessages}">
+            <div class="isMe message received no-tail">
+              <span id="user-message" style="font-size: ${fontSize}px">${message}</span>
+              <span class="metadata"><span class="time">${timestamp}${checkmark}</span></span>
+            </div>
+          </div>`;
+      }
+    }    
+
+    $('.main-container').prepend(element);
+
+    gsap.fromTo(`#msg-${totalMessages}`,
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" }
+    );
+    
+    document.querySelectorAll(".main-container .message-row").forEach((el, i) => {
+        if (i >= maxMessages) {
+          gsap.timeline().to(el, { opacity: 0 }).add(() => {
+            el.remove();
+          });
+        }
+    });
+}
+
+//FOLLOW//
 async function FollowNotification(data) {
     ultimoUsuario = "";
     const usuario = data.user_name;
@@ -275,6 +434,48 @@ async function FollowNotification(data) {
           });
         }
     });
+}
+
+//RAID//
+async function RaidNotification(data) {
+    audioNotification.play(); 
+    const usuario = data.from_broadcaster_user_name;
+    const cantidad = data.viewers;
+    const avatarUrl = await obtenerAvatar(usuario);
+    let texto = '';
+    if(cantidad == 1){
+        texto = `Bro, estamos afuera y traje a un invitado`;
+    }else{
+        texto = `Bro, estamos afuera y traje a ${cantidad} invitados`;
+    }
+    
+
+    const now = new Date();
+    const time = now.toTimeString().slice(0, 5);
+
+    const element = $(`
+        <div class="raid-notification-container">
+            <div class="raid-notification-wrapper">
+                <span class="raid-usuario">
+                    <img src="${avatarUrl}" class="raid-avatar" />
+                    ${usuario}
+                    <span class="raid-time">${time}</span>
+                </span>
+                <div class="raid-texto">${texto}</div>
+            </div>
+        </div>
+    `);
+
+    $('.notification-zone').prepend(element);
+
+    setTimeout(() => {
+        element.addClass('show');
+    }, 50);
+
+    setTimeout(() => {
+        element.removeClass('show');
+        setTimeout(() => element.remove(), 400);
+    }, 5000);
 }
 
 //TIMEOUT USER//
@@ -355,11 +556,16 @@ function obtenerBooleanos(parametro, valor){
     }
 }
 
-function recortarTexto(replyText, maxLength) {
-    return replyText.length > maxLength
-        ? replyText.substring(0, maxLength - 3) + "..."
-        : replyText;
-}
+// function recortarTexto(replyText, maxLength) {
+    
+//     replyText = replyText.length > maxLength
+//         ? replyText.substring(0, maxLength - 3) + "..."
+//         : replyText;
+
+//     replyText = agregarEmotesARespuestas(replyText);
+
+//     return replyText;
+// }
 
 //STREAMERBOT STATUS FUNCTION//
 
@@ -381,17 +587,18 @@ function setConnectionStatus(connected){
     }
 }
 
-
-
 const data = {
-    "user_id": 123456,
-    "user_login": "shroud",
-    "user_name": "Shroud",
-    "isTest": true
+    "from_broadcaster_id": 123456,
+    "from_broadcaster_user_login": "shroud",
+    "from_broadcaster_user_name": "Shroud",
+    "viewers": 13
 };
+
+//RaidNotification(data);
+
 
 //FollowNotification(data);
 
 // setInterval(() => {
-//     FollowNotification(data);
-// }, 20000);
+//     RaidNotification(data);
+// }, 3000);

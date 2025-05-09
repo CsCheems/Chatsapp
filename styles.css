@@ -30,7 +30,7 @@ body
 	text-transform: uppercase;
 	font-family: "Cal Sans", sans-serif;
 	font-weight: bold;
-	font-size: 30px;
+	font-size: 22px;
 	width: 400px;
 	max-width: fit-content;
 	text-align: center;
@@ -44,7 +44,93 @@ body
 	transform: translate(-50%, -50%);
 }
 
+/*RAID NOTIFICATION*/
 
+.notification-zone {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 10px;
+    z-index: 10;
+}
+
+
+
+.raid-notification-container {
+     background-color: #202C33;
+    color: #fff;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+    max-width: 300px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    transform: translateY(-100%);
+    opacity: 0;
+    transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+    position: relative;
+}
+
+.raid-notification-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.raid-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 8px;
+}
+
+.raid-usuario {
+    font-weight: bold;
+    color: #25D366; /* verde estilo WhatsApp */
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.raid-time {
+    font-size: 11px;
+    color: #aaa;
+}
+
+.raid-texto {
+    font-size: 13px;
+    background: #1D282F;
+    padding: 6px 8px;
+    border-radius: 6px;
+    word-wrap: break-word;
+    line-height: 1.3em;
+    box-shadow: inset 0 0 2px #000;
+}
+
+.raid-notification-container.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/*MESSAGES*/
 .message-wrapper {
     display: flex;
     align-items: flex-start;
@@ -254,6 +340,36 @@ body
   }
 
   .message.received.no-tail {
+	border-radius: 5px;
+  }
+
+  /*IS ME*/
+
+    .isMe.message.received {
+	bottom: 0;
+	right: 0;
+	margin-right: 10px;
+	background: #293942;
+	border-radius: 5px 0px 5px 5px;
+  }
+  
+  .isMe.message.received .metadata {
+	padding: 0 0 0 16px;
+  }
+  
+  .isMe.message.received:after {
+	border-width: 0px 0px 10px 10px;
+	border-color: transparent #293942 #293942 transparent;
+	top: 0;
+	transform: rotate(180deg);
+	left: 72px;
+  }
+
+  .isMe.message.received.no-tail:after {
+	display: none;
+  }
+
+  .isMe.message.received.no-tail {
 	border-radius: 5px;
   }
 
