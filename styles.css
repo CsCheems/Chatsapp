@@ -6,9 +6,9 @@ body
 }
 
 
-.main-container{
+#main-container{
 
-	background-image: url('https://i.pinimg.com/736x/c7/41/73/c741736a9fdd7b58928748979dbd50d7.jpg');
+	/*background-image: url('https://i.pinimg.com/736x/c7/41/73/c741736a9fdd7b58928748979dbd50d7.jpg');*/
 	/*background-image: url('https://cloud.githubusercontent.com/assets/398893/15136779/4e765036-1639-11e6-9201-67e728e86f39.jpg');*/
 	background-position: center;
 	background-size: cover;

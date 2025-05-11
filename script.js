@@ -13,7 +13,6 @@ var audioNotification = document.createElement('audio');
 document.createElement('audioNotification');
 audioNotification.setAttribute('src', './static/IPhone WhatsApp sound.mp3');
 audioNotification.volume = 0.25;
-
 const checkmark = `<img src='https://img.icons8.com/?size=12&id=21740&format=png&color=00C2FF'/>`;
 
 //CLIENTE//
@@ -39,10 +38,13 @@ const fontSize = urlParameters.get("tamañoFuente") || "16";
 const showRedeemMessages = obtenerBooleanos("mostrarCanjes", true);
 const showCheerMessages = obtenerBooleanos("mostrarMensajesBits", true);
 const showRaidMessage = obtenerBooleanos("mostrarRaids", true);
-const showGiantEmotes = obtenerBooleanos("mostrarEmotesGigantes", true);
 const excludeCommands = obtenerBooleanos("excluirComandos", true);
 const ignoredUsers = urlParameters.get("usuariosIgnorados") || "";
+const playSound = obtenerBooleanos("sonidoNotificacion", true);
+const backgroundImg = urlParameters.get("fondoPantalla") || "";
 
+const main = document.getElementById('main-container');
+main.style.backgroundImage = `url(${backgroundImg})`;
 
 //EVENTOS//
 client.on('Twitch.ChatMessage', (response) => {
@@ -244,7 +246,7 @@ async function ChatMessage(data) {
       }
     }    
 
-    $('.main-container').prepend(element);
+    $('#main-container').prepend(element);
 
     gsap.fromTo(`#msg-${totalMessages}`,
         { y: 30, opacity: 0 },
@@ -261,147 +263,149 @@ async function ChatMessage(data) {
 }
 
 //IS ME MESSAGE//
-async function ChatMessageIsMe(data) {
-    console.log(data);
-    //ASIGNACION DE VALORES OBTENIDOS DEL DATA//
-    const usuario = data.user.name;
-    const uid = data.message.userId;
-    const role = data.user.role;
-    const color = data.user.color;
-    const msgId = data.messageId;
-    const esRespuesta = data.message.isReply;
-    let message = data;
-    let timestamp= '';
 
-    let replyUser = '';
-    let replyUserId = '';
-    let replyMsg = '';
-    let replyMsgId = '';
+// async function ChatMessageIsMe(data) {
+//     console.log(data);
+//     //ASIGNACION DE VALORES OBTENIDOS DEL DATA//
+//     const usuario = data.user.name;
+//     const uid = data.message.userId;
+//     const role = data.user.role;
+//     const color = data.user.color;
+//     const msgId = data.messageId;
+//     const esRespuesta = data.message.isReply;
+//     let message = data;
+//     let timestamp= '';
 
-    //AQUI ASIGNAMOS LOS COLORES AL HASHMAP//
-    colorHashMap.set(usuario, color);
+//     let replyUser = '';
+//     let replyUserId = '';
+//     let replyMsg = '';
+//     let replyMsgId = '';
 
-    //VALORES PARA LA RESPUESTA//
-    if(esRespuesta){
-         replyUser = data.message.reply.userName;
-         replyUserId = data.message.reply.Id;
-         replyMsg = data.message.reply.msgBody;
-         replyMsgId = data.message.reply.msgId;
-    }
+//     //AQUI ASIGNAMOS LOS COLORES AL HASHMAP//
+//     colorHashMap.set(usuario, color);
+
+//     //VALORES PARA LA RESPUESTA//
+//     if(esRespuesta){
+//          replyUser = data.message.reply.userName;
+//          replyUserId = data.message.reply.Id;
+//          replyMsg = data.message.reply.msgBody;
+//          replyMsgId = data.message.reply.msgId;
+//     }
     
-    //VERIFICAMOS SI LOS COMANDOS SON EXCLUIDOS//
-    if(data.message.message.startsWith("!") && excludeCommands){
-        return;
-    }
+//     //VERIFICAMOS SI LOS COMANDOS SON EXCLUIDOS//
+//     if(data.message.message.startsWith("!") && excludeCommands){
+//         return;
+//     }
 
-    //VERIFICAMOS SI EL USUARIO ES IGNORADO//
-    if(ignoredUsers.includes(usuario)){
-        return;
-    }
+//     //VERIFICAMOS SI EL USUARIO ES IGNORADO//
+//     if(ignoredUsers.includes(usuario)){
+//         return;
+//     }
 
-    //OBTENCION DE EMOTES//
-    message = agregarEmotes(message);
-    replyMsg = agregarEmotesARespuestas(replyMsg);
+//     //OBTENCION DE EMOTES//
+//     message = agregarEmotes(message);
+//     replyMsg = agregarEmotesARespuestas(replyMsg);
 
-    //REGEX PARA IMAGENES//
-    const imgRegex = /^https:\/\/.*\.(gif|png|jpg|jpeg|webp)$/;
-    const imgMatch = message.match(imgRegex);
-        //true && 1 >= 0 && 0 != 0 && true
-    if (imgMatch && role >= rolUsuario && rolUsuario != 0 && showImages) {
-            const imgSrc = imgMatch[0];
-            const imgTag = `<img src="${imgSrc}" alt="Image" id="imgur-image" />`;
-            message = message.replace(imgMatch[0], imgTag);
-    } else {
-        console.log("No cuenta con el permiso necesario o no es imagen");
-    }
+//     //REGEX PARA IMAGENES//
+//     const imgRegex = /^https:\/\/.*\.(gif|png|jpg|jpeg|webp)$/;
+//     const imgMatch = message.match(imgRegex);
+//         //true && 1 >= 0 && 0 != 0 && true
+//     if (imgMatch && role >= rolUsuario && rolUsuario != 0 && showImages) {
+//             const imgSrc = imgMatch[0];
+//             const imgTag = `<img src="${imgSrc}" alt="Image" id="imgur-image" />`;
+//             message = message.replace(imgMatch[0], imgTag);
+//     } else {
+//         console.log("No cuenta con el permiso necesario o no es imagen");
+//     }
 
-    //TIMESTAMP//
-    const now = new Date();
-    const horas = String(now.getHours()).padStart(2, '0');
-    const minutos = String(now.getMinutes()).padStart(2, '0');
-    const time = `${horas}:${minutos}`;
+//     //TIMESTAMP//
+//     const now = new Date();
+//     const horas = String(now.getHours()).padStart(2, '0');
+//     const minutos = String(now.getMinutes()).padStart(2, '0');
+//     const time = `${horas}:${minutos}`;
     
-    timestamp = `<span id="time" style="margin-right: 4px">${time}</span>`;
+//     timestamp = `<span id="time" style="margin-right: 4px">${time}</span>`;
 
-    totalMessages += 1;
+//     totalMessages += 1;
 
-    //MENSAJE ARMADO//
-    if(esRespuesta){
-        message = message.replace(/^@\w+\s*/, '');
-        replyMsg = replyMsg.replace(/^@\w+\s*/, '');
-        if(ultimoUsuario !== usuario){
-            ultimoUsuario = usuario;
-            const replyUserColor = colorHashMap.get(replyUser) || "#aaa";
-            element = `
-            <div data-sender="${uid}" data-msgid="${msgId}" class="message-wrapper animated new-user" style="margin-top:10px" id="msg-${totalMessages}">
-              <div class=" message sended">
-                <div>
-                    <div data-sender="${replyUserId}" data-msgid="${replyMsgId}" class="messageReply-wrapper">
-                        <div class="replyInfo">
-                            <strong class="replyUser" style="color: ${replyUserColor}">${replyUser}</strong><br>
-                            <div id="replyMsg" class="message-body" style="font-size: ${fontSize}px">${replyMsg}</div>
-                        </div>
-                    </div>
-                </div>
-                <div id="user-message" class="message-content" style="font-size: ${fontSize}px margin-left: 10px">${message}</div>
-                <span class="metadata"><span class="time">${timestamp}</span></span>
-              </div>
-            </div>`;
+//     //MENSAJE ARMADO//
+//     if(esRespuesta){
+//         message = message.replace(/^@\w+\s*/, '');
+//         replyMsg = replyMsg.replace(/^@\w+\s*/, '');
+//         if(ultimoUsuario !== usuario){
+//             ultimoUsuario = usuario;
+//             const replyUserColor = colorHashMap.get(replyUser) || "#aaa";
+//             element = `
+//             <div data-sender="${uid}" data-msgid="${msgId}" class="message-wrapper animated new-user" style="margin-top:10px" id="msg-${totalMessages}">
+//               <div class=" message sended">
+//                 <div>
+//                     <div data-sender="${replyUserId}" data-msgid="${replyMsgId}" class="messageReply-wrapper">
+//                         <div class="replyInfo">
+//                             <strong class="replyUser" style="color: ${replyUserColor}">${replyUser}</strong><br>
+//                             <div id="replyMsg" class="message-body" style="font-size: ${fontSize}px">${replyMsg}</div>
+//                         </div>
+//                     </div>
+//                 </div>
+//                 <div id="user-message" class="message-content" style="font-size: ${fontSize}px margin-left: 10px">${message}</div>
+//                 <span class="metadata"><span class="time">${timestamp}</span></span>
+//               </div>
+//             </div>`;
 
-        } else{
-            const replyUserColor = colorHashMap.get(replyUser) || "#aaa";
-            element = `
-            <div data-sender="${uid}" data-msgid="${msgId}" class="message-row animated same-user" style="margin-top:4px" id="msg-${totalMessages}">
-                <div class="message sended no-tail ">
-                <div>
-                    <div data-sender="${replyUserId}" data-msgid="${replyMsgId}" class="messageReply-wrapper">
-                        <div class="replyInfo">
-                            <strong class="replyUser" style="color: ${replyUserColor}">${replyUser}</strong><br>
-                            <div id="replyMsg" class="message-body" style="font-size: ${fontSize}px">${replyMsg}</div>
-                        </div>
-                    </div>
-                </div>
-                <span id="user-message" style="font-size: ${fontSize}px margin-left: 10px">${message}</span>
-                <span class="metadata"><span class="time">${timestamp}</span></span>
-                </div>
-            </div>`;
-        }
-    }else{
-    if (ultimoUsuario !== usuario) {
-        ultimoUsuario = usuario;
-        element = `
-          <div data-sender="${uid}" data-msgid="${msgId}" class="message-wrapper animated new-user" style="margin-top:10px" id="msg-${totalMessages}">
-            <div class="message sended">
-              <div id="user-message" class="message-content" style="font-size: ${fontSize}px">${message}</div>
-              <span class="metadata"><span class="time">${timestamp}${checkmark}</span></span>
-            </div>
-          </div>`;
-      } else {
-        element = `
-          <div data-sender="${uid}" data-msgid="${msgId}" class="message-row animated same-user" style="margin-top:4px" id="msg-${totalMessages}">
-            <div class="message sended no-tail">
-              <span id="user-message" style="font-size: ${fontSize}px">${message}</span>
-              <span class="metadata"><span class="time">${timestamp}${checkmark}</span></span>
-            </div>
-          </div>`;
-      }
-    }    
+//         } else{
+//             const replyUserColor = colorHashMap.get(replyUser) || "#aaa";
+//             element = `
+//             <div data-sender="${uid}" data-msgid="${msgId}" class="message-row animated same-user" style="margin-top:4px" id="msg-${totalMessages}">
+//                 <div class="message sended no-tail ">
+//                 <div>
+//                     <div data-sender="${replyUserId}" data-msgid="${replyMsgId}" class="messageReply-wrapper">
+//                         <div class="replyInfo">
+//                             <strong class="replyUser" style="color: ${replyUserColor}">${replyUser}</strong><br>
+//                             <div id="replyMsg" class="message-body" style="font-size: ${fontSize}px">${replyMsg}</div>
+//                         </div>
+//                     </div>
+//                 </div>
+//                 <span id="user-message" style="font-size: ${fontSize}px margin-left: 10px">${message}</span>
+//                 <span class="metadata"><span class="time">${timestamp}</span></span>
+//                 </div>
+//             </div>`;
+//         }
+//     }else{
+//     if (ultimoUsuario !== usuario) {
+//         ultimoUsuario = usuario;
+//         element = `
+//           <div data-sender="${uid}" data-msgid="${msgId}" class="message-wrapper animated new-user" style="margin-top:10px" id="msg-${totalMessages}">
+//             <div class="message sended">
+//               <div id="user-message" class="message-content" style="font-size: ${fontSize}px">${message}</div>
+//               <span class="metadata"><span class="time">${timestamp}${checkmark}</span></span>
+//             </div>
+//           </div>`;
+//       } else {
+//         element = `
+//           <div data-sender="${uid}" data-msgid="${msgId}" class="message-row animated same-user" style="margin-top:4px" id="msg-${totalMessages}">
+//             <div class="message sended no-tail">
+//               <span id="user-message" style="font-size: ${fontSize}px">${message}</span>
+//               <span class="metadata"><span class="time">${timestamp}${checkmark}</span></span>
+//             </div>
+//           </div>`;
+//       }
+//     }    
 
-    $('.main-container').prepend(element);
+//     $('.main-container').prepend(element);
 
-    gsap.fromTo(`#msg-${totalMessages}`,
-        { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" }
-    );
+//     gsap.fromTo(`#msg-${totalMessages}`,
+//         { y: 30, opacity: 0 },
+//         { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" }
+//     );
     
-    document.querySelectorAll(".main-container .message-row").forEach((el, i) => {
-        if (i >= maxMessages) {
-          gsap.timeline().to(el, { opacity: 0 }).add(() => {
-            el.remove();
-          });
-        }
-    });
-}
+//     document.querySelectorAll(".main-container .message-row").forEach((el, i) => {
+//         if (i >= maxMessages) {
+//           gsap.timeline().to(el, { opacity: 0 }).add(() => {
+//             el.remove();
+//           });
+//         }
+//     });
+// }
+/**/
 
 //FOLLOW//
 async function FollowNotification(data) {
@@ -420,7 +424,7 @@ async function FollowNotification(data) {
         </div>
     `;
 
-    $('.main-container').prepend(element);
+    $('#main-container').prepend(element);
 
     gsap.fromTo(`#msg-${totalMessages}`,
         { y: 30, opacity: 0 },
@@ -438,7 +442,9 @@ async function FollowNotification(data) {
 
 //RAID//
 async function RaidNotification(data) {
-    audioNotification.play(); 
+    if(playSound){
+        audioNotification.play(); 
+    }
     const usuario = data.from_broadcaster_user_name;
     const cantidad = data.viewers;
     const avatarUrl = await obtenerAvatar(usuario);
@@ -555,17 +561,6 @@ function obtenerBooleanos(parametro, valor){
         return valor;
     }
 }
-
-// function recortarTexto(replyText, maxLength) {
-    
-//     replyText = replyText.length > maxLength
-//         ? replyText.substring(0, maxLength - 3) + "..."
-//         : replyText;
-
-//     replyText = agregarEmotesARespuestas(replyText);
-
-//     return replyText;
-// }
 
 //STREAMERBOT STATUS FUNCTION//
 
