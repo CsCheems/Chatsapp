@@ -333,8 +333,8 @@ async function ChatMessageIsMe(data) {
             ultimoUsuario = usuario;
             const replyUserColor = colorHashMap.get(replyUser) || "#aaa";
             element = `
-            <div data-sender="${uid}" data-msgid="${msgId}" class="message-wrapper animated new-user isMe" style="margin-top:10px" id="msg-${totalMessages}">
-              <div class="isMe message received">
+            <div data-sender="${uid}" data-msgid="${msgId}" class="message-wrapper animated new-user" style="margin-top:10px" id="msg-${totalMessages}">
+              <div class=" message sended">
                 <div>
                     <div data-sender="${replyUserId}" data-msgid="${replyMsgId}" class="messageReply-wrapper">
                         <div class="replyInfo">
@@ -351,8 +351,8 @@ async function ChatMessageIsMe(data) {
         } else{
             const replyUserColor = colorHashMap.get(replyUser) || "#aaa";
             element = `
-            <div data-sender="${uid}" data-msgid="${msgId}" class="message-row animated same-user isMe" style="margin-top:4px" id="msg-${totalMessages}">
-                <div class="isMe message received no-tail ">
+            <div data-sender="${uid}" data-msgid="${msgId}" class="message-row animated same-user" style="margin-top:4px" id="msg-${totalMessages}">
+                <div class="message sended no-tail ">
                 <div>
                     <div data-sender="${replyUserId}" data-msgid="${replyMsgId}" class="messageReply-wrapper">
                         <div class="replyInfo">
@@ -370,16 +370,16 @@ async function ChatMessageIsMe(data) {
     if (ultimoUsuario !== usuario) {
         ultimoUsuario = usuario;
         element = `
-          <div data-sender="${uid}" data-msgid="${msgId}" class="message-wrapper animated new-user isMe" style="margin-top:10px" id="msg-${totalMessages}">
-            <div class="isMe message received">
+          <div data-sender="${uid}" data-msgid="${msgId}" class="message-wrapper animated new-user" style="margin-top:10px" id="msg-${totalMessages}">
+            <div class="message sended">
               <div id="user-message" class="message-content" style="font-size: ${fontSize}px">${message}</div>
               <span class="metadata"><span class="time">${timestamp}${checkmark}</span></span>
             </div>
           </div>`;
       } else {
         element = `
-          <div data-sender="${uid}" data-msgid="${msgId}" class="message-row animated same-user isMe" style="margin-top:4px" id="msg-${totalMessages}">
-            <div class="isMe message received no-tail">
+          <div data-sender="${uid}" data-msgid="${msgId}" class="message-row animated same-user" style="margin-top:4px" id="msg-${totalMessages}">
+            <div class="message sended no-tail">
               <span id="user-message" style="font-size: ${fontSize}px">${message}</span>
               <span class="metadata"><span class="time">${timestamp}${checkmark}</span></span>
             </div>
