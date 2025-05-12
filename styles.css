@@ -188,6 +188,17 @@ body
 	grid-row: 2;
 }
 
+#imgur-image {
+	max-width: 75%;
+	max-height: 300px;
+	width: 100%;
+	height: 100%;
+	border-radius: 8px;
+	margin-top: 5px;
+	object-fit: contain;
+}
+
+
 /* Follow */
 
 .main-container .follow-row{
